@@ -21,8 +21,8 @@ input('Press enter after login')
 
 date = datetime.date.today().strftime('%Y%m%d')
 with open(f'science-{date}.md', 'w') as f:
-    f.write('% Science\n')
-    f.write(f'% {date}\n\n')
+    f.write(f'% Science Magazine {date}\n')
+    f.write('% Science\n\n')
     for title, author, url in tqdm(articles):
         driver.get(url)
 
@@ -30,6 +30,8 @@ with open(f'science-{date}.md', 'w') as f:
         f.write(f'{author}\n\n')
         try:
             cores = driver.find_elements_by_class_name('core-container')
+            if len(cores) == 0:
+                cores = driver.find_elements_by_class_name('bodySection')
             for core in cores:
                 sections = core.find_elements_by_xpath('.//h2 | .//div[@role="paragraph"] | .//p')
                 for section in sections:
