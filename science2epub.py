@@ -1,6 +1,7 @@
 """Convert current Science magazine to epub."""
 
 import datetime
+import os
 
 from selenium import webdriver
 from tqdm import tqdm
@@ -21,28 +22,22 @@ input('Press enter after login')
 date = datetime.date.today().strftime('%Y%m%d')
 with open(f'science-{date}.md', 'w') as f:
     f.write('% Science\n')
-    f.write('% {date}\n\n')
+    f.write(f'% {date}\n\n')
     for title, author, url in tqdm(articles):
         driver.get(url)
 
         f.write(f'# {title}\n\n')
         f.write(f'{author}\n\n')
         try:
-            elem = driver.find_element_by_xpath('.//section[@id="bodymatter"]')
-            sections = elem.find_elements_by_xpath('.//section')
-            for section in sections:
-                ptitle = section.find_element_by_xpath('.//h2').text
-                ptext = section.find_element_by_xpath('.//div[@role="paragraph"]').text
-                f.write(f'## {ptitle}\n\n')
-                f.write(f'{ptext}\n\n')
+            cores = driver.find_elements_by_class_name('core-container')
+            for core in cores:
+                sections = core.find_elements_by_xpath('.//h2 | .//div[@role="paragraph"] | .//p')
+                for section in sections:
+                    if section.tag_name == 'h2':
+                        f.write(f'## {section.text}\n\n')
+                    elif section.tag_name == 'div' or section.tag_name == 'p':
+                        f.write(f'{section.text}\n\n')
         except:
-            try:
-                elem = driver.find_element_by_class_name('bodySection')
-            except:
-                elem = driver.find_element_by_class_name('core-container')
+            print(f'Could not crawl data for {title}: {url}')
 
-            paragraphs = (elem.find_elements_by_xpath('.//p')
-                + driver.find_elements_by_xpath('.//div[@role="paragraph"]'))
-            for paragraph in paragraphs:
-                if len(paragraph.text) > 10:
-                    f.write(paragraph.text + '\n\n')
+os.system(f'pandoc -s science-{date}.md -o science-{date}.epub')
