@@ -59,5 +59,5 @@ with open(f'{tempdir}/science-{date}.md', 'w') as f:
                     img_path = img_src.split('/')[-1]
                     f.write(f'![{fn_caption}: {fn_notes}]({tempdir}/{img_path})\n\n')
 
-os.system(f'for file in $(find {tempdir}/*.jpg -type f -size +1000b); do convert -resize 25% {tempdir}/${file} {tempdir}/${file}; done')
+os.system(f'for file in $(find {tempdir}/*.jpg -type f -size +1000b); do convert -resize 25% {tempdir}/$file {tempdir}/$file; done')
 os.system(f'pandoc --number-sections -s {tempdir}/science-{date}.md -o ./science-{date}.epub')
