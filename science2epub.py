@@ -59,6 +59,8 @@ with open(f'{tempdir}/science-{date}.md', 'w') as f:
                     img_path = img_src.split('/')[-1]
                     f.write(f'![{fn_caption}: {fn_notes}]({tempdir}/{img_path})\n\n')
 
-os.system(f'for file in $(find {tempdir}/*.jpg -type f); do convert -resize 500x500\\> $file $file; done')
-os.system(f'for file in $(find {tempdir}/*.svg -type f); do convert -resize 500x500\\> $file $file; done')
+print('Converting images to correct sizes.')
+os.system(f'for file in $(find {tempdir}/*.jpg -type f); do echo $file; convert -resize 500x500\\> $file $file; done')
+os.system(f'for file in $(find {tempdir}/*.svg -type f); do echo $file; convert -resize 500x500\\> $file $file; done')
+print('Create epub')
 os.system(f'pandoc --number-sections -s {tempdir}/science-{date}.md -o ./science-{date}.epub')
