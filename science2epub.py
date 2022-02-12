@@ -38,7 +38,11 @@ with open(f'{tempdir}/science-{date}.md', 'w') as f:
             sections = core.find_elements_by_xpath('.//h2 | .//div[@role="paragraph"] | .//p | .//figure')
             for section in sections:
                 if section.tag_name == 'h2':
-                    f.write(f'## {section.text}\n\n')
+                    if 'Acknowledgments' in section.text or 'References and Notes' in section.text:
+                        # Skip Acknowledgments and References as they will not parse (yet).
+                        continue
+                    else:
+                        f.write(f'## {section.text}\n\n')
                 elif section.tag_name == 'div' or section.tag_name == 'p':
                     f.write(f'{section.text}\n\n')
                 elif section.tag_name == 'figure':
